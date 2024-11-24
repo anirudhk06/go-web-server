@@ -10,6 +10,10 @@ import (
 func main() {
 	port := configs.Envs.Port
 
+	configs.ConnectToDB()
+	// migrating the database
+	configs.SyncDatabase()
+
 	server := api.NewAPIServer(port)
 
 	if err := server.Run(); err != nil {

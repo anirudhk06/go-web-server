@@ -1,18 +1,37 @@
 package configs
 
 import (
+	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Configs struct {
-	Port string
+	Port       string
+	DBHost     string
+	DBUser     string
+	DBPassword string
+	DBName     string
+	DBPort     string
 }
 
 var Envs = loadEnv()
 
 func loadEnv() Configs {
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return Configs{
-		Port: getEnv("PORT", "8000"),
+		Port:       getEnv("PORT", "8000"),
+		DBHost:     getEnv("DBHost", "localhost"),
+		DBUser:     getEnv("DBUser", "postgres"),
+		DBPassword: getEnv("DBPassword", ""),
+		DBName:     getEnv("DBName", ""),
+		DBPort:     getEnv("DBPort", "5432"),
 	}
 }
 
