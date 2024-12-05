@@ -3,8 +3,10 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/anirudhk06/go-web-server/configs"
 	"github.com/anirudhk06/go-web-server/models"
 	"github.com/anirudhk06/go-web-server/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +25,22 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		utils.WriteJSON(w, result, http.StatusBadRequest)
 		return
 	}
-	utils.WriteJSON(w, map[string]string{"status": "success"}, http.StatusCreated)
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(payload.Password), 10)
+
+	if err != nil {
+		utils.WriteJSON(w, map[string]string{"detail": "Something went wrong"}, http.StatusInternalServerError)
+		return
+	}
+
+	user := models.User{
+		Email:    payload.Email,
+		Password: string(hash),
+	}
+
+	configs.DB.Create(&user)
+
+	utils.WriteJSON(w, user, http.StatusCreated)
 	return
 }
 

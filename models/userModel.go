@@ -1,8 +1,10 @@
 package models
 
 import (
+	"fmt"
 	"strings"
 
+	"github.com/anirudhk06/go-web-server/configs"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
@@ -28,6 +30,13 @@ func (p RegisterPayload) Validate() map[string]string {
 	err := validate.Struct(p)
 
 	result := map[string]string{}
+
+	isExists := configs.DB.Where("email = ?", p.Email).First(&User{}).Error
+
+	if isExists == nil {
+		result["email"] = fmt.Sprintf("User with email '%s' already exists", p.Email)
+		return result
+	}
 
 	if err != nil {
 		errs := err.(validator.ValidationErrors)
