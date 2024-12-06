@@ -73,14 +73,23 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+	access := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.ID,
 		"exp": time.Now().Add(time.Second * 10).Unix(),
 		"iat": time.Now().Unix(),
 	})
 
+	refresh := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": user.ID,
+		"exp": time.Now().Add(time.Hour * 10).Unix(),
+		"iat": time.Now().Unix(),
+	})
+
+	accessToken, _ := access.SignedString([]byte("secret"))
+	refreshToken, _ := refresh.SignedString([]byte("secret"))
+
 	utils.WriteJSON(w, map[string]string{
-		"access": "",
-		"refrsh": "",
+		"access": accessToken,
+		"refrsh": refreshToken,
 	}, http.StatusOK)
 }

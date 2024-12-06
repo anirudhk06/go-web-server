@@ -14,6 +14,7 @@ type Configs struct {
 	DBPassword string
 	DBName     string
 	DBPort     string
+	JWTSecret  string
 }
 
 var Envs = loadEnv()
@@ -32,6 +33,7 @@ func loadEnv() Configs {
 		DBPassword: getEnv("DBPassword", ""),
 		DBName:     getEnv("DBName", ""),
 		DBPort:     getEnv("DBPort", "5432"),
+		JWTSecret:  getEnv("JWT_SECRET", "jwt-secret"),
 	}
 }
 
