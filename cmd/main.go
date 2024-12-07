@@ -1,20 +1,27 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/anirudhk06/go-web-server/cmd/api"
 	"github.com/anirudhk06/go-web-server/configs"
+	"github.com/anirudhk06/go-web-server/db"
 )
 
 func main() {
 	port := configs.Envs.Port
 
-	configs.ConnectToDB()
+	db, err := db.PostgresStorage(configs.Envs.DBString)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	server := api.NewAPIServer(port)
+	fmt.Println("Successfully connected to the postgres")
 
-	if err := server.Run(); err != nil {
+	server := api.NewAPIServer(port, db)
+
+	if err = server.Run(); err != nil {
 		log.Fatal(err)
 	}
 

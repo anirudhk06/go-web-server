@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/anirudhk06/go-web-server/routes"
+	"github.com/anirudhk06/go-web-server/service/user"
+	"gorm.io/gorm"
 )
 
 type APIServer struct {
 	addr string
+	db   *gorm.DB
 }
 
-func NewAPIServer(addr string) *APIServer {
+func NewAPIServer(addr string, db *gorm.DB) *APIServer {
 	return &APIServer{
 		addr: addr,
+		db:   db,
 	}
 }
 
@@ -21,10 +24,11 @@ func (s *APIServer) Run() error {
 	mux := http.NewServeMux()
 	v1 := http.NewServeMux()
 
-	v1.Handle("/auth/", http.StripPrefix("/auth", routes.AuthRoutes()))
+	userStore := user.NewStore(s.db)
+	userRoutes := user.NewHandler(userStore)
+	userRoutes.UserRoutes(v1)
 
 	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", v1))
-
 	fmt.Printf("Server is running on port: %s\n", s.addr)
 	return http.ListenAndServe(":"+s.addr, mux)
 }
