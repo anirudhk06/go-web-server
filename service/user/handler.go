@@ -44,35 +44,44 @@ func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	utils.ParseJSON(r, &payload)
 
-	err := payload.Validate()
+	errors := payload.Validate()
 
-	if len(err) > 0 {
-		utils.WriteError(w, http.StatusBadRequest, err)
+	if len(errors) > 0 {
+		utils.WriteError(w, http.StatusBadRequest, errors)
 		return
 	}
 
-	_, err := h.store.GetUserByEmail("anirudh")
+	user, err := h.store.GetUserByEmail(payload.Email)
 
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, map[string]string{"error": "Invalidm credentials."})
+		utils.WriteError(w, http.StatusBadRequest, map[string]string{"error": "Invalid credentials."})
 		return
 	}
 
-	err = auth.ValidatePassword("", "")
+	isValid := auth.ValidatePassword(user.Password, []byte(payload.Password))
+
+	if !isValid {
+		utils.WriteError(w, http.StatusBadRequest, map[string]string{"error": "Invalid credentials."})
+		return
+
+	}
+
+	token, err := auth.CreateJWT(user.ID)
 
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, map[string]string{"error": "Invalidm credentials."})
+		utils.InternalServerError(w)
 		return
-
 	}
 
-	utils.WriteJSON(w, http.StatusOK, map[string]any{"access": "", "refresh": ""})
+	utils.WriteJSON(w, http.StatusOK, map[string]any{"access": token, "refresh": ""})
 
 }
 
 func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	users, _ := h.store.FindUsers()
 
-	utils.WriteJSON(w, http.StatusOK, users)
+	utils.WriteJSON(w, http.StatusOK, map[string]any{
+		"users": users,
+	})
 
 }
