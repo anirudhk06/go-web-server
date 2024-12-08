@@ -1,10 +1,13 @@
 package auth
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/anirudhk06/go-web-server/configs"
+	"github.com/anirudhk06/go-web-server/types"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -26,6 +29,25 @@ func CreateJWT(userID uint) (string, error) {
 
 }
 
-func ValidateJWT(token string) error {
-	return nil
+func ValidateJWT(tokenString string) (*jwt.Token, error) {
+
+	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("Invalid signin method")
+		}
+
+		return []byte(configs.Envs.JWTSecret), nil
+
+	})
+
+}
+
+func GetUserFromContext(ctx context.Context) (*types.User, bool) {
+	user, ok := ctx.Value("user").(types.User)
+
+	if !ok {
+		return nil, false
+	}
+	return &user, true
 }

@@ -21,5 +21,5 @@ func (h *Handler) UserRoutes(routes *http.ServeMux) {
 	routes.HandleFunc("POST /auth/register", h.HandleRegister)
 	routes.HandleFunc("POST /auth/login", h.HandleLogin)
 	routes.HandleFunc("POST /auth/logout", h.HandleLogout)
-	routes.HandleFunc("GET /users", middleware.AuthMiddleware(h.GetUsers))
+	routes.HandleFunc("GET /users", middleware.AuthMiddleware(h.GetUsers, h.store))
 }

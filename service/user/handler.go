@@ -85,7 +85,7 @@ func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &tokenCookie)
 
-	utils.WriteJSON(w, http.StatusOK, map[string]any{"access": token, "refresh": ""})
+	utils.WriteJSON(w, http.StatusOK, map[string]any{"user": user})
 
 }
 
@@ -103,6 +103,7 @@ func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
+
 	users, _ := h.store.FindUsers()
 
 	utils.WriteJSON(w, http.StatusOK, map[string]any{
