@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/anirudhk06/go-web-server/service/auth"
 	"github.com/anirudhk06/go-web-server/types"
@@ -73,8 +74,32 @@ func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tokenCookie := http.Cookie{
+		Name:     "access",
+		Value:    token,
+		Expires:  time.Now().Add(24 * time.Hour),
+		HttpOnly: true,
+		Secure:   true,
+		Path:     "/",
+	}
+
+	http.SetCookie(w, &tokenCookie)
+
 	utils.WriteJSON(w, http.StatusOK, map[string]any{"access": token, "refresh": ""})
 
+}
+
+func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		Secure:   true,
+		Path:     "/",
+	})
+
+	w.Write([]byte("success"))
 }
 
 func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {

@@ -25,3 +25,7 @@ func CreateJWT(userID uint) (string, error) {
 	return tokenString, nil
 
 }
+
+func ValidateJWT(token string) error {
+	return nil
+}

@@ -23,3 +23,9 @@ func WriteError(w http.ResponseWriter, statusCode int, err any) error {
 func InternalServerError(w http.ResponseWriter) error {
 	return WriteJSON(w, http.StatusInternalServerError, map[string]any{"detail": "Internal server error"})
 }
+
+func Unauthorized(w http.ResponseWriter) error {
+	return WriteJSON(w, http.StatusUnauthorized, map[string]any{
+		"detail": "Unauthorized",
+	})
+}
