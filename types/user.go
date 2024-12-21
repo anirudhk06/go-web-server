@@ -1,8 +1,9 @@
 package types
 
 import (
+	"time"
+
 	"github.com/go-playground/validator/v10"
-	"gorm.io/gorm"
 )
 
 type UserStore interface {
@@ -13,9 +14,11 @@ type UserStore interface {
 }
 
 type User struct {
-	gorm.Model
-	Email    string `json:"email" gorm:"required,unique,not null"`
-	Password string `json:"-" gorm:"required,not null"`
+	ID        uint      `json:"id" gorm:"primarykey"`
+	Email     string    `json:"email" gorm:"required,unique,not null"`
+	Password  string    `json:"-" gorm:"required,not null"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 type RegisterPayload struct {
