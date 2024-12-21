@@ -31,11 +31,11 @@ func (s *Store) GetUserByID(ID int) (*types.User, error) {
 	return nil, nil
 }
 
-func (s *Store) FindUsers() ([]types.User, error) {
-
+func (s *Store) FindUsers(page, limit int) ([]types.User, int64, error) {
 	var users []types.User
-
-	err := s.DB.Find(&users).Error
-	return users, err
+	var count int64
+	s.DB.Find(&types.User{}).Count(&count)
+	err := s.DB.Limit(limit).Offset(page).Find(&users).Error
+	return users, count, err
 
 }

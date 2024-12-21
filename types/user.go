@@ -9,7 +9,7 @@ type UserStore interface {
 	GetUserByEmail(email string) (*User, error)
 	CreateUser(User) error
 	GetUserByID(ID int) (*User, error)
-	FindUsers() ([]User, error)
+	FindUsers(page, limit int) ([]User, int64, error)
 }
 
 type User struct {

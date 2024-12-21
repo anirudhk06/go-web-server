@@ -104,10 +104,15 @@ func (h *Handler) HandleLogout(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
 
-	users, _ := h.store.FindUsers()
+	page, offset, limit := utils.GetPaginator(r)
+
+	users, count, _ := h.store.FindUsers(offset, limit)
 
 	utils.WriteJSON(w, http.StatusOK, map[string]any{
-		"users": users,
+		"current": page,
+		"limit":   limit,
+		"count":   count,
+		"users":   users,
 	})
 
 }
